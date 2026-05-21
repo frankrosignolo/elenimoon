@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Summer Piano Explorers Camp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Imbue:opsz,wght@10..100,100..900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #FBF7EE; }
+  body { font-family: 'EB Garamond', Georgia, serif; }
+  a { color: inherit; }
+
+  @keyframes pcDrift {
+    0%   { transform: translateY(0) translateX(0); }
+    100% { transform: translateY(-120vh) translateX(0); }
+  }
+  @keyframes pcSway {
+    0%   { margin-left: 0; }
+    100% { margin-left: var(--sway, 30px); }
+  }
+  @keyframes pcMarquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  html { scroll-behavior: smooth; }
+
+  @media (max-width: 900px) {
+    .resp-grid-2 { grid-template-columns: 1fr !important; }
+    .resp-grid-4 { grid-template-columns: 1fr 1fr !important; }
+    .resp-hide { display: none !important; }
+  }
+  @media (max-width: 600px) {
+    .resp-grid-2, .resp-grid-4 { grid-template-columns: 1fr !important; }
+    .resp-3col { grid-template-columns: 1fr !important; }
+    .resp-nav { display: none !important; }
+
+    /* Hero metadata strip */
+    .hero-meta-center { display: none !important; }
+
+    /* Hero info row → stacked */
+    .hero-info-row {
+      grid-template-columns: 1fr !important;
+      justify-items: center;
+      text-align: center !important;
+      gap: 24px !important;
+    }
+    .hero-loc { text-align: center !important; }
+
+    /* Overview promise divider */
+    .promise-divider {
+      border-right: none !important;
+      padding-right: 0 !important;
+      border-bottom: 2px solid #010F14;
+      padding-bottom: 40px !important;
+    }
+
+    /* Schedule timeline */
+    .sched-row { grid-template-columns: 60px 28px 1fr !important; gap: 10px !important; }
+    .sched-time { font-size: 14px !important; }
+    .sched-label { font-size: 20px !important; }
+    .sched-note { font-size: 14px !important; }
+    .sched-line { left: 74px !important; }
+
+    /* About section badges */
+    .badge-left {
+      left: 6px !important;
+      top: 12px !important;
+      transform: rotate(-3deg) !important;
+      font-size: 11px !important;
+      padding: 10px 12px !important;
+      letter-spacing: .12em !important;
+    }
+    .badge-right {
+      right: 4px !important;
+      bottom: 16px !important;
+      font-size: 13px !important;
+    }
+
+    /* FAQ accordion */
+    .faq-q-btn { font-size: 18px !important; padding: 18px 4px !important; }
+    .faq-a-body { padding-left: 24px !important; padding-right: 12px !important; font-size: 15px !important; }
+
+    /* CTA button */
+    .cta-sign-btn {
+      padding: 18px 28px !important;
+      font-size: 18px !important;
+      box-shadow: 5px 5px 0 #83B0B8 !important;
+    }
+    .cta-meta { font-size: 14px !important; }
+
+    /* Footer bottom bar */
+    .footer-copy { flex-direction: column !important; gap: 6px !important; align-items: center !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" data-presets="react">
+
+// ─── Palette & Config ─────────────────────────────────────────────────────────
+
+const C = { accent: "#83B0B8", ink: "#010F14", brown: "#685044", cream: "#FBF7EE" };
+const body = '"EB Garamond", Georgia, serif';
+const PAD_DESK = 88;
+const GAP_DESK = 160;
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+const CAMP = {
+  name: "Summer Piano Explorers",
+  tagline: "Play, learn, and explore the world of music this summer.",
+  dates: "July 13–24, 2026",
+  time: "Mon–Fri · 12:00–4:00 pm",
+  ages: "Ages 5+",
+  location: "Pound Ridge, NY",
+  email: "eleni.moon09@gmail.com",
+  phone: "(914) 215-2782",
+  ig: "@esh4rp",
+  signUpUrl: "https://forms.gle/AifYyggcxVZJgTBZ6"
+};
+
+const SCHEDULE = [
+  { t: "9:00",  label: "Private Lessons",          note: "1-on-1 instruction" },
+  { t: "9:35",  label: "Drop-off / Arrival",        note: "for those without lesson today" },
+  { t: "9:40",  label: "Music Theory",              note: "reading notes, scales, chords" },
+  { t: "10:15", label: "Ear Training & Rhythm",     note: "listening + tapping games" },
+  { t: "10:45", label: "Snack Break",               note: "fuel up" },
+  { t: "11:20", label: "Practicing Fundamentals",   note: "technique, hand position" },
+  { t: "12:40", label: "Music History",             note: "stories of the great composers" },
+  { t: "1:10",  label: "Discovery Lab",             note: "compose, collaborate, create" },
+  { t: "1:55",  label: "Pick-up",                   note: "" },
+  { t: "2:00",  label: "Private Lessons",           note: "1-on-1 instruction" },
+];
+
+const CURRICULUM = [
+  {
+    icon: "♪",
+    title: "Private Piano",
+    short: "1-on-1 lessons tailored to each student's level.",
+    long: "Every camper gets dedicated one-on-one time at the piano, learning a piece picked just for them. Beginners start from the very first note; intermediates delve deeper."
+  },
+  {
+    icon: "𝄞",
+    title: "Music Theory",
+    short: "Reading notes, hand position, scales, chords.",
+    long: "We make theory tangible — colored note cards, musical games, and lots of playing. Kids leave knowing how to read music and why it works the way it does."
+  },
+  {
+    icon: "♬",
+    title: "Ear Training & Rhythm",
+    short: "Listening exercises and rhythm-tapping games.",
+    long: "Recognizing melodies and intervals, clapping rhythms, echoing patterns — building the inner ear that turns a player into a musician."
+  },
+  {
+    icon: "♛",
+    title: "Music History",
+    short: "Stories behind the music we play.",
+    long: "From Bach's wig to Clara Schumann's tour life — the great composers were real people, and their stories make the notes come alive."
+  },
+  {
+    icon: "✺",
+    title: "Discovery Lab",
+    short: "Compose, collaborate, and play together.",
+    long: "An end-of-day creative space: compose short themes, jam in small ensembles, decode the chords behind favorite pop songs."
+  },
+  {
+    icon: "★",
+    title: "Final Recital",
+    short: "A short performance on the last day.",
+    long: "On Friday of week two, every camper performs a piece they've worked on — for family, friends, and the camp community."
+  },
+];
+
+const FAQ = [
+  {
+    q: "My child has never touched a piano. Is that okay?",
+    a: "Absolutely — this camp is built for first-time learners. Beginners are the heart of what we do. We start at the very beginning and build confidence one small step at a time."
+  },
+  {
+    q: "Do we need a piano at home?",
+    a: "Helpful but not required. A keyboard with weighted keys works wonderfully, and we'll send home practice ideas that don't require a full piano."
+  },
+  {
+    q: "What should my child bring?",
+    a: "A water bottle, a snack, and curiosity. We'll provide all music, materials, and a folder for your child's work."
+  },
+  {
+    q: "How many students per session?",
+    a: "Spots are intentionally limited so every camper gets real one-on-one time. Reach out for current availability."
+  },
+  {
+    q: "Can siblings attend together?",
+    a: "Yes! Siblings are welcome and often love sharing the experience. Just mention it on the sign-up form."
+  },
+  {
+    q: "Where exactly is camp held?",
+    a: "In Pound Ridge, NY. The specific address is shared upon registration."
+  },
+];
+
+// ─── Shared Components ────────────────────────────────────────────────────────
+
+function useWindowWidth() {
+  const [w, setW] = React.useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+  React.useEffect(() => {
+    const fn = () => setW(window.innerWidth);
+    window.addEventListener("resize", fn, { passive: true });
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return w;
+}
+
+function useReveal() {
+  const ref = React.useRef(null);
+  const [seen, setSeen] = React.useState(false);
+  React.useEffect(() => {
+    if (!ref.current || seen) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => { if (e.isIntersecting) { setSeen(true); io.disconnect(); } });
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [seen]);
+  return [ref, seen];
+}
+
+function Reveal({ children, delay = 0, y = 24, style, ...rest }) {
+  const [ref, seen] = useReveal();
+  return (
+    <div
+      ref={ref}
+      style={{
+        opacity: seen ? 1 : 0,
+        transform: seen ? "translateY(0)" : `translateY(${y}px)`,
+        transition: `opacity 800ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 900ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
+        ...style
+      }}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+function DriftingNotes({ count = 14, color = "#83B0B8", opacity = 0.18 }) {
+  const notes = React.useMemo(() => {
+    const glyphs = ["♪", "♩", "♫", "♬", "𝄞", "♭", "♯"];
+    return Array.from({ length: count }).map((_, i) => ({
+      g: glyphs[i % glyphs.length],
+      left: (i * 7.3 + 3) % 100,
+      size: 18 + (i * 13.7) % 36,
+      dur: 18 + (i * 11.3) % 18,
+      delay: -(i * 5.7) % 30,
+      sway: 20 + (i * 9.1) % 40,
+    }));
+  }, [count]);
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+      {notes.map((n, i) => (
+        <span
+          key={i}
+          style={{
+            position: "absolute",
+            left: `${n.left}%`,
+            bottom: "-60px",
+            fontSize: `${n.size}px`,
+            color,
+            opacity,
+            animation: `pcDrift ${n.dur}s linear ${n.delay}s infinite, pcSway ${n.dur / 2}s ease-in-out ${n.delay}s infinite alternate`,
+            ["--sway"]: `${n.sway}px`,
+            fontFamily: 'Imbue, "Cormorant Garamond", serif',
+          }}
+        >
+          {n.g}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MiniPiano() {
+  const winW = useWindowWidth();
+  const width = Math.min(620, winW - 40);
+
+  const ctxRef = React.useRef(null);
+  const getCtx = () => {
+    if (!ctxRef.current) {
+      try { ctxRef.current = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    }
+    return ctxRef.current;
+  };
+  const play = (freq) => {
+    const ac = getCtx();
+    if (!ac) return;
+    if (ac.state === "suspended") ac.resume();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = "triangle";
+    o.frequency.value = freq;
+    g.gain.value = 0;
+    o.connect(g).connect(ac.destination);
+    const t = ac.currentTime;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.18, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
+    o.start(t);
+    o.stop(t + 1.2);
+  };
+
+  const whites = [
+    { n: "C",  f: 261.63, label: "do" },
+    { n: "D",  f: 293.66, label: "re" },
+    { n: "E",  f: 329.63, label: "mi" },
+    { n: "F",  f: 349.23, label: "fa" },
+    { n: "G",  f: 392.00, label: "sol" },
+    { n: "A",  f: 440.00, label: "la" },
+    { n: "B",  f: 493.88, label: "ti" },
+    { n: "C2", f: 523.25, label: "do" },
+  ];
+  const blacks = [
+    { n: "C#", f: 277.18, after: 0 },
+    { n: "D#", f: 311.13, after: 1 },
+    { n: "F#", f: 369.99, after: 3 },
+    { n: "G#", f: 415.30, after: 4 },
+    { n: "A#", f: 466.16, after: 5 },
+  ];
+
+  const wKeyW = width / whites.length;
+  const wKeyH = wKeyW * 3.6;
+  const bKeyW = wKeyW * 0.62;
+  const bKeyH = wKeyH * 0.6;
+  const [pressed, setPressed] = React.useState(null);
+  const tap = (k) => { setPressed(k); play(k.f); setTimeout(() => setPressed(null), 220); };
+
+  return (
+    <div style={{ position: "relative", width, height: wKeyH, filter: "drop-shadow(0 18px 28px rgba(1,15,20,.18))" }}>
+      <div style={{ display: "flex", width: "100%", height: wKeyH, borderRadius: "6px 6px 10px 10px", overflow: "hidden", border: `1.5px solid ${C.ink}` }}>
+        {whites.map((k, i) => (
+          <button
+            key={k.n}
+            onClick={() => tap(k)}
+            style={{
+              flex: 1,
+              background: pressed && pressed.n === k.n ? C.accent : "#FBF7EE",
+              cursor: "pointer",
+              position: "relative",
+              transition: "background 120ms ease",
+              padding: 0,
+              fontFamily: '"Cormorant Garamond", Imbue, serif',
+              fontStyle: "italic",
+              color: C.ink + "88",
+              fontSize: Math.max(10, wKeyW * 0.28),
+              paddingBottom: 8,
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              border: "none",
+              borderRight: i < whites.length - 1 ? `1px solid ${C.ink}33` : "none",
+            }}
+          >
+            {k.label}
+          </button>
+        ))}
+      </div>
+      {blacks.map((k) => (
+        <button
+          key={k.n}
+          onClick={() => tap(k)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: `${((k.after + 1) / whites.length) * 100}%`,
+            transform: `translateX(-50%)`,
+            width: `${(bKeyW / width) * 100}%`,
+            height: bKeyH,
+            background: pressed && pressed.n === k.n ? C.accent : C.ink,
+            borderRadius: "0 0 4px 4px",
+            border: "none",
+            cursor: "pointer",
+            boxShadow: "inset 0 -4px 0 rgba(0,0,0,.4)",
+            transition: "background 120ms ease",
+            padding: 0,
+          }}
+          aria-label={k.n}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CurriculumCard({ c, i }) {
+  const [hover, setHover] = React.useState(false);
+  return (
+    <Reveal delay={i * 60}>
+      <div
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onClick={() => setHover((h) => !h)}
+        style={{
+          padding: "32px 28px",
+          background: hover ? C.accent : "transparent",
+          color: hover ? C.ink : C.cream,
+          border: `1px solid ${C.cream}33`,
+          transition: "background 350ms ease, color 350ms ease, border-color 350ms ease",
+          cursor: "pointer",
+          minHeight: 280,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
+      >
+        <div style={{
+          fontFamily: "Imbue, serif",
+          fontSize: 64,
+          lineHeight: 0.9,
+          color: hover ? C.ink : C.accent,
+          transition: "color 350ms ease",
+        }}>
+          {c.icon}
+        </div>
+        <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", opacity: 0.7, marginTop: 20 }}>
+          {String(i + 1).padStart(2, "0")} · of 06
+        </div>
+        <div style={{ fontFamily: "Imbue, serif", fontSize: 30, lineHeight: 1.1, marginTop: 8, fontWeight: 400 }}>
+          {c.title}
+        </div>
+        <div style={{
+          fontFamily: body,
+          fontSize: 16,
+          lineHeight: 1.5,
+          marginTop: 12,
+          maxHeight: hover ? 200 : 50,
+          overflow: "hidden",
+          transition: "max-height 400ms cubic-bezier(.2,.7,.2,1)",
+          position: "relative",
+        }}>
+          <div style={{ opacity: hover ? 0 : 1, transition: "opacity 250ms ease", position: hover ? "absolute" : "static" }}>
+            {c.short}
+          </div>
+          <div style={{ opacity: hover ? 1 : 0, transition: "opacity 350ms ease 100ms" }}>
+            {c.long}
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
+function DarkAccordion({ items }) {
+  const [open, setOpen] = React.useState(0);
+  return (
+    <div style={{ borderTop: `1px solid ${C.cream}33` }}>
+      {items.map((it, i) => {
+        const isOpen = open === i;
+        return (
+          <div key={i} style={{ borderBottom: `1px solid ${C.cream}33` }}>
+            <button
+              className="faq-q-btn"
+              onClick={() => setOpen(isOpen ? -1 : i)}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 24,
+                padding: "26px 4px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                textAlign: "left",
+                color: C.cream,
+                fontFamily: "Imbue, serif",
+                fontSize: 30,
+                fontWeight: 400,
+                lineHeight: 1.2,
+              }}
+            >
+              <span style={{ display: "flex", gap: 18, alignItems: "baseline" }}>
+                <span style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", color: C.accent, fontSize: 18, minWidth: 36 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span>{it.q}</span>
+              </span>
+              <span style={{
+                fontSize: 32,
+                color: C.accent,
+                transition: "transform 300ms cubic-bezier(.2,.7,.2,1)",
+                transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                flexShrink: 0,
+              }}>+</span>
+            </button>
+            <div style={{
+              display: "grid",
+              gridTemplateRows: isOpen ? "1fr" : "0fr",
+              transition: "grid-template-rows 400ms cubic-bezier(.2,.7,.2,1)",
+            }}>
+              <div style={{ overflow: "hidden" }}>
+                <div
+                  className="faq-a-body"
+                  style={{
+                    paddingLeft: 54,
+                    paddingRight: 40,
+                    paddingBottom: 26,
+                    fontFamily: body,
+                    fontSize: 18,
+                    lineHeight: 1.6,
+                    color: C.cream + "CC",
+                    maxWidth: 760,
+                  }}
+                >
+                  {it.a}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
+function Page() {
+  const winW = useWindowWidth();
+  const mob = winW <= 600;
+  const tab = winW <= 900;
+  const p = mob ? 20 : tab ? 44 : PAD_DESK;
+  const sg = mob ? 64 : tab ? 100 : GAP_DESK;
+
+  const paperGrain = {
+    backgroundImage: `radial-gradient(${C.ink}10 1px, transparent 1px)`,
+    backgroundSize: "4px 4px",
+  };
+
+  return (
+    <div style={{ background: C.cream, color: C.ink, fontFamily: body, position: "relative", overflow: "hidden", ...paperGrain }}>
+
+      {/* ── Marquee top bar ── */}
+      <div style={{
+        background: C.ink,
+        color: C.cream,
+        padding: "10px 0",
+        fontFamily: "Imbue, serif",
+        fontSize: mob ? 11 : 14,
+        letterSpacing: ".22em",
+        textTransform: "uppercase",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      }}>
+        <div style={{ display: "inline-block", animation: "pcMarquee 40s linear infinite" }}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <span key={i} style={{ marginRight: 60 }}>
+              ★ Pound Ridge, NY · July 13–24, 2026 · Ages 5+ · A Two-Week Piano Camp · Limited Seats · Sign-up Open ★&nbsp;&nbsp;
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Header ── */}
+      <header style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: `${mob ? 14 : 22}px ${p}px`,
+        borderBottom: `2px solid ${C.ink}`,
+      }}>
+        <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 20 : 26, lineHeight: 1, color: C.ink }}>
+          E.M. <span style={{ color: C.brown, fontStyle: "italic" }}>Studio</span>
+        </div>
+        <nav className="resp-nav" style={{ display: "flex", gap: 32, fontFamily: "Imbue, serif", fontSize: 14, letterSpacing: ".18em", textTransform: "uppercase", color: C.ink }}>
+          <a href="#program" style={{ textDecoration: "none" }}>Program</a>
+          <a href="#day" style={{ textDecoration: "none" }}>Day</a>
+          <a href="#about" style={{ textDecoration: "none" }}>Eleni</a>
+          <a href="#faq" style={{ textDecoration: "none" }}>FAQ</a>
+        </nav>
+        <a
+          href={CAMP.signUpUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            background: C.accent,
+            color: C.ink,
+            padding: mob ? "10px 14px" : "12px 22px",
+            fontFamily: "Imbue, serif",
+            fontSize: mob ? 11 : 14,
+            letterSpacing: ".18em",
+            textTransform: "uppercase",
+            textDecoration: "none",
+            border: `1.5px solid ${C.ink}`,
+            whiteSpace: "nowrap",
+          }}
+        >
+          Sign Up
+        </a>
+      </header>
+
+      {/* ── Hero ── */}
+      <section style={{
+        position: "relative",
+        padding: `${mob ? 40 : p * 0.7}px ${p}px ${p}px`,
+        overflow: "hidden",
+        borderBottom: `2px solid ${C.ink}`,
+      }}>
+        <DriftingNotes count={14} color={C.brown} opacity={0.16} />
+        <div style={{ position: "relative", zIndex: 2 }}>
+
+          {/* Top metadata strip */}
+          <Reveal>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              fontFamily: "Imbue, serif",
+              fontSize: mob ? 10 : 14,
+              letterSpacing: ".22em",
+              textTransform: "uppercase",
+              color: C.brown,
+              marginBottom: 28,
+              paddingBottom: 14,
+              borderBottom: `1px solid ${C.ink}33`,
+            }}>
+              <span>Presenting</span>
+              <span className="hero-meta-center">TWO WEEKS · 10 DAYS · 1 FINAL RECITAL</span>
+              <span>MMXXVI</span>
+            </div>
+          </Reveal>
+
+          {/* Big poster type */}
+          <Reveal delay={100}>
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 22 : 32, color: C.brown, marginBottom: 8 }}>
+                — the —
+              </div>
+              <h1 style={{
+                fontFamily: "Imbue, serif",
+                fontSize: "clamp(64px, 16vw, 240px)",
+                lineHeight: 0.82,
+                fontWeight: 400,
+                margin: 0,
+                color: C.ink,
+                letterSpacing: "-0.02em",
+              }}>
+                Summer<br />
+                <em style={{ fontStyle: "italic", color: C.accent, position: "relative", display: "inline-block" }}>
+                  Piano
+                  <svg viewBox="0 0 400 60" style={{ position: "absolute", left: "-8%", bottom: "-20px", width: "116%", height: 40 }} preserveAspectRatio="none">
+                    <path d="M5 30 Q 100 5, 200 30 T 395 25" stroke={C.brown} strokeWidth="3" fill="none" strokeLinecap="round" />
+                  </svg>
+                </em><br />
+                Explorers
+              </h1>
+              <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 22 : 32, color: C.brown, marginTop: mob ? 20 : 30 }}>
+                — camp —
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Bottom info row */}
+          <Reveal delay={250}>
+            <div
+              className="hero-info-row"
+              style={{
+                marginTop: mob ? 36 : 60,
+                display: "grid",
+                gridTemplateColumns: "1fr auto 1fr",
+                gap: mob ? 20 : 40,
+                alignItems: "center",
+                borderTop: `2px solid ${C.ink}`,
+                borderBottom: `2px solid ${C.ink}`,
+                padding: `${mob ? 20 : 28}px 0`,
+              }}
+            >
+              <div>
+                <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+                  DATES
+                </div>
+                <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 20 : 32, lineHeight: 1.1, color: C.ink, marginTop: 6 }}>
+                  July 13 — 24<br /><em style={{ fontStyle: "italic", color: C.accent }}>Twenty Twenty-Six</em>
+                </div>
+              </div>
+              <a
+                href={CAMP.signUpUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: C.ink,
+                  color: C.cream,
+                  padding: mob ? "16px 20px" : "26px 40px",
+                  fontFamily: "Imbue, serif",
+                  fontSize: mob ? 14 : 22,
+                  letterSpacing: ".14em",
+                  textTransform: "uppercase",
+                  textDecoration: "none",
+                  border: `2px solid ${C.ink}`,
+                  whiteSpace: "nowrap",
+                  boxShadow: mob ? `5px 5px 0 ${C.accent}` : `8px 8px 0 ${C.accent}`,
+                  transition: "transform 150ms ease, box-shadow 150ms ease",
+                  display: "inline-block",
+                  textAlign: "center",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translate(-3px,-3px)"; e.currentTarget.style.boxShadow = `11px 11px 0 ${C.accent}`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translate(0,0)"; e.currentTarget.style.boxShadow = mob ? `5px 5px 0 ${C.accent}` : `8px 8px 0 ${C.accent}`; }}
+              >
+                Reserve a Seat ★
+              </a>
+              <div className="hero-loc" style={{ textAlign: "right" }}>
+                <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+                  Held in
+                </div>
+                <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 20 : 32, lineHeight: 1.1, color: C.ink, marginTop: 6 }}>
+                  Pound Ridge<br /><em style={{ fontStyle: "italic", color: C.accent }}>New York</em>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={350}>
+            <div style={{ textAlign: "center", marginTop: 30, maxWidth: 820, marginLeft: "auto", marginRight: "auto" }}>
+              <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown, marginBottom: 16 }}>Mission Statement</div>
+              <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 16 : 19, color: C.ink + "CC", lineHeight: 1.7 }}>
+                <p style={{ margin: "0 0 1.2em" }}>At Summer Piano Explorers, we strive to foster creativity and genuine enjoyment in young musicians. By encouraging students to actively create, explore, and take ownership of their own musical voice, we guide them towards a lifelong journey in the arts. We hope to help them experience the fulfillment that comes from making something meaningful of their own.</p>
+                <p style={{ margin: 0 }}>Our goal may be simple, but it is lasting: that each child leaves not only a better pianist, but a more inspired, confident, creatively engaged individual who finds as much joy in creating as they do in consuming.</p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── Overview Split ── */}
+      <section style={{ padding: `${sg}px ${p}px`, position: "relative" }}>
+        <Reveal>
+          <div className="resp-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: mob ? 40 : 64, alignItems: "stretch" }}>
+            <div className="promise-divider" style={{ position: "relative", borderRight: `2px solid ${C.ink}`, paddingRight: mob ? 0 : 60 }}>
+              <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+                The Promise · 01
+              </div>
+              <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(40px, 7vw, 88px)", lineHeight: 0.92, fontWeight: 400, margin: "20px 0 0", color: C.ink }}>
+                <span style={{ color: "rgb(1, 14, 20)" }}>From playing notes to making </span>
+                <em style={{ color: "#83b1b9", fontStyle: "italic" }}>music.</em>
+              </h2>
+              <p style={{ fontFamily: body, fontSize: mob ? 17 : 21, lineHeight: 1.55, marginTop: 28, color: C.ink + "DD" }}>
+                Each camper gets dedicated <em>one-on-one time</em> at the keys, learning a piece chosen for them. Theory, ear, history, and creative play fill the hours in between.
+              </p>
+            </div>
+            <div>
+              <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+                The Promise · 02
+              </div>
+              <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(40px, 7vw, 88px)", lineHeight: 0.92, fontWeight: 400, margin: "20px 0 0", color: C.ink }}>
+                Ends with<br />a <em style={{ fontStyle: "italic", color: C.brown }}>finale showcase.</em>
+              </h2>
+              <p style={{ fontFamily: body, fontSize: mob ? 17 : 21, lineHeight: 1.55, marginTop: 28, color: C.ink + "DD" }}>
+                On the final Friday, every camper performs in a recital for family, friends, and fellow musicians.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── Curriculum ── */}
+      <section id="program" style={{ padding: `${sg}px ${p}px`, background: C.ink, color: C.cream, position: "relative", overflow: "hidden" }}>
+        <DriftingNotes count={12} color={C.cream} opacity={0.08} />
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Reveal>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: mob ? 36 : 64, gap: 40, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", color: C.accent, fontSize: 16, letterSpacing: ".06em", textTransform: "uppercase" }}>
+                  ※ The Curriculum
+                </div>
+                <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(44px, 8vw, 80px)", lineHeight: 0.95, fontWeight: 400, marginTop: 18, color: C.cream, maxWidth: 800 }}>
+                  Six ways<br />to create, explore<br />and <em style={{ color: C.accent, fontStyle: "italic" }}>begin</em>.
+                </h2>
+              </div>
+              {!mob && (
+                <div style={{ fontFamily: body, fontSize: 18, lineHeight: 1.6, color: C.cream + "AA", maxWidth: 360 }}>
+                  Hover or tap a card to read more.
+                </div>
+              )}
+            </div>
+          </Reveal>
+
+          <div className="resp-3col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: mob ? 12 : 18 }}>
+            {CURRICULUM.map((c, i) => <CurriculumCard key={i} c={c} i={i} />)}
+          </div>
+          {mob && (
+            <div style={{ fontFamily: body, fontSize: 15, lineHeight: 1.6, color: C.cream + "88", marginTop: 20, textAlign: "center", fontStyle: "italic" }}>
+              Tap a card to read more.
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Interactive Piano ── */}
+      <section style={{ padding: `${sg * 0.8}px ${p}px`, background: C.accent + "33", borderBottom: `2px solid ${C.ink}` }}>
+        <Reveal>
+          <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto" }}>
+            <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+              ✺ Try it ✺
+            </div>
+            <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(36px, 8vw, 72px)", lineHeight: 0.95, fontWeight: 400, marginTop: 16, color: C.ink }}>
+              <em style={{ fontStyle: "italic" }}>Press</em> a key.<br />Make a sound.
+            </h2>
+            <p style={{ fontFamily: body, fontSize: mob ? 16 : 19, lineHeight: 1.5, marginTop: 18, color: C.ink + "CC" }}>
+              That's how it begins.
+            </p>
+            <div style={{ display: "grid", placeItems: "center", marginTop: mob ? 32 : 50 }}>
+              <MiniPiano />
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── Daily Itinerary ── */}
+      <section id="day" style={{ padding: `${sg}px ${p}px`, position: "relative" }}>
+        <Reveal>
+          <div style={{ textAlign: "center", marginBottom: mob ? 40 : 72 }}>
+            <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", color: C.brown, fontSize: 16, letterSpacing: ".06em", textTransform: "uppercase" }}>
+              ※ A Day at Camp
+            </div>
+            <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(44px, 8vw, 80px)", lineHeight: 0.95, fontWeight: 400, marginTop: 18, color: C.ink }}>
+              Piano <em style={{ color: C.accent, fontStyle: "italic" }}>Explorers</em><br />Session 1
+            </h2>
+          </div>
+        </Reveal>
+
+        <div style={{ maxWidth: 880, margin: "0 auto", position: "relative" }}>
+          <div className="sched-line" style={{ position: "absolute", left: mob ? 74 : 130, top: 0, bottom: 0, width: 1, background: C.ink + "33" }} />
+          {SCHEDULE.map((s, i) => (
+            <Reveal key={i} delay={i * 50}>
+              <div
+                className="sched-row"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: mob ? "60px 28px 1fr" : "120px 40px 1fr",
+                  gap: mob ? 10 : 24,
+                  alignItems: "baseline",
+                  padding: "20px 0",
+                  borderBottom: `1px dashed ${C.ink}1F`,
+                }}
+              >
+                <div className="sched-time" style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 14 : 22, color: C.brown, textAlign: "right" }}>
+                  {s.t}
+                </div>
+                <div style={{ display: "grid", placeItems: "center" }}>
+                  <div style={{ width: mob ? 10 : 12, height: mob ? 10 : 12, borderRadius: "50%", background: C.accent, border: `1.5px solid ${C.ink}` }} />
+                </div>
+                <div>
+                  <div className="sched-label" style={{ fontFamily: "Imbue, serif", fontSize: mob ? 20 : 28, color: C.ink, lineHeight: 1.1 }}>
+                    {s.label}
+                  </div>
+                  {s.note && (
+                    <div className="sched-note" style={{ fontFamily: body, fontStyle: "italic", fontSize: mob ? 14 : 17, color: C.ink + "AA", marginTop: 4 }}>
+                      {s.note}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Audience ── */}
+      <section style={{
+        padding: `${sg}px ${p}px`,
+        background: C.brown,
+        color: C.cream,
+        position: "relative",
+        overflow: "hidden",
+        borderTop: `2px solid ${C.ink}`,
+        borderBottom: `2px solid ${C.ink}`,
+      }}>
+        <Reveal>
+          <div className="resp-grid-2" style={{ display: "grid", gridTemplateColumns: ".9fr 1.1fr", gap: mob ? 40 : 72, alignItems: "center" }}>
+            <div>
+              <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.accent }}>
+                Made for
+              </div>
+              <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(52px, 10vw, 96px)", lineHeight: 0.9, fontWeight: 400, marginTop: 18, color: C.cream }}>
+                <em style={{ fontStyle: "italic", color: C.accent }}>First-time</em><br />players.
+              </h2>
+              <p style={{ fontFamily: body, fontSize: mob ? 17 : 22, lineHeight: 1.5, marginTop: 28, color: C.cream + "EE", maxWidth: 480 }}>
+                Five and up. No prior music experience needed. We start at the very first note — and build from there with patience and care.
+              </p>
+            </div>
+            <div className="resp-grid-4" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: mob ? 12 : 18 }}>
+              {[
+                { t: "Total beginner",       d: "Has never touched a piano.", icon: "♪" },
+                { t: "Curious creator",       d: "Loves drawing, building, dancing.",  icon: "✦" },
+                { t: "Small-group thriver",   d: "Does best in a focused, calm setting.", icon: "❀" },
+                { t: "Trying it on",          d: "Wants to see if music is for them.", icon: "★" },
+              ].map((b, i) => (
+                <Reveal key={i} delay={i * 80}>
+                  <div style={{
+                    background: C.cream,
+                    color: C.ink,
+                    padding: mob ? "18px 16px" : "26px 24px",
+                    border: `2px solid ${C.ink}`,
+                    minHeight: mob ? 140 : 180,
+                    display: "flex",
+                    flexDirection: "column",
+                    boxShadow: `5px 5px 0 ${C.accent}`,
+                  }}>
+                    <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 28 : 36, color: C.accent, lineHeight: 1 }}>{b.icon}</div>
+                    <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 17 : 22, marginTop: mob ? 10 : 18, color: C.ink }}>{b.t}</div>
+                    <div style={{ fontFamily: body, fontSize: mob ? 14 : 16, lineHeight: 1.5, marginTop: 6, color: C.ink + "BB" }}>{b.d}</div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── About Eleni ── */}
+      <section id="about" style={{ padding: `${sg}px ${p}px`, position: "relative" }}>
+        <Reveal>
+          <div style={{ textAlign: "center", marginBottom: mob ? 36 : 64 }}>
+            <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+              ✺ Your instructor ✺
+            </div>
+            <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(52px, 10vw, 136px)", lineHeight: 0.9, fontWeight: 400, marginTop: 18, color: C.ink }}>
+              Meet <em style={{ fontStyle: "italic", color: C.accent }}>Eleni</em>.
+            </h2>
+          </div>
+        </Reveal>
+
+        <div className="resp-grid-2" style={{ display: "grid", gridTemplateColumns: ".9fr 1.1fr", gap: mob ? 40 : 80, alignItems: "start", maxWidth: 1280, margin: "0 auto" }}>
+          <Reveal>
+            <div style={{ position: "relative" }}>
+              <img
+                src="eleni.png"
+                alt="Eleni Moon · Founder"
+                style={{ width: "100%", aspectRatio: "3 / 4", objectFit: "cover", objectPosition: "center top", display: "block", background: C.brown }}
+              />
+              <div className="badge-left" style={{
+                position: "absolute",
+                left: -28,
+                top: 24,
+                padding: "16px 18px",
+                background: C.ink,
+                color: C.cream,
+                fontFamily: "Imbue, serif",
+                fontSize: 14,
+                letterSpacing: ".18em",
+                textTransform: "uppercase",
+                transform: "rotate(-6deg)",
+              }}>
+                MSM Pre-College
+              </div>
+              <div className="badge-right" style={{
+                position: "absolute",
+                right: -20,
+                bottom: 30,
+                padding: "12px 16px",
+                background: C.accent,
+                color: C.ink,
+                border: `1.5px solid ${C.ink}`,
+                fontFamily: '"Cormorant Garamond", serif',
+                fontStyle: "italic",
+                fontSize: 16,
+                transform: "rotate(4deg)",
+                boxShadow: `4px 4px 0 ${C.brown}`,
+              }}>
+                11 yrs at the keys
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={120}>
+            <div style={{ position: "relative" }}>
+              <span style={{
+                fontFamily: "Imbue, serif",
+                fontSize: mob ? 140 : 240,
+                lineHeight: 0.7,
+                color: C.accent,
+                position: "absolute",
+                left: mob ? -10 : -30,
+                top: mob ? -20 : -40,
+                opacity: 0.6,
+              }}>"</span>
+              <div style={{
+                fontFamily: '"Cormorant Garamond", serif',
+                fontStyle: "italic",
+                fontSize: mob ? 20 : 30,
+                lineHeight: 1.4,
+                color: C.ink,
+                position: "relative",
+                zIndex: 2,
+              }}>
+                I still remember walking to the beat of the metronome and learning to read notes from those big, brightly-colored pages — I'd be honored to be a part of (or to start) your child's musical journey.
+              </div>
+              <div style={{ marginTop: 40, fontFamily: "Imbue, serif", fontSize: mob ? 18 : 22, color: C.brown, lineHeight: 1.4 }}>
+                — Eleni Moon
+              </div>
+              <div style={{ marginTop: 36, display: "grid", gridTemplateColumns: "1fr 1fr", gap: mob ? 16 : 24 }}>
+                {[
+                  { l: "Studying",  v: "Classical piano, 12 years" },
+                  { l: "School",    v: "Manhattan School of Music · Pre-College" },
+                  { l: "Stage",     v: "Recitals & competitions, US + intl." },
+                  { l: "Teaching",  v: "2+ years tutoring kids" },
+                ].map((f, i) => (
+                  <div key={i} style={{ borderTop: `1.5px solid ${C.ink}`, paddingTop: 14 }}>
+                    <div style={{ fontFamily: "Imbue, serif", fontSize: 11, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+                      {f.l}
+                    </div>
+                    <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 15 : 19, color: C.ink, marginTop: 4, lineHeight: 1.3 }}>
+                      {f.v}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section id="faq" style={{ padding: `${sg}px ${p}px`, background: C.ink, color: C.cream, borderTop: `2px solid ${C.ink}` }}>
+        <Reveal>
+          <div style={{ textAlign: "center", marginBottom: mob ? 36 : 64 }}>
+            <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.accent }}>
+              — Frequently Asked —
+            </div>
+            <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(44px, 10vw, 128px)", lineHeight: 0.9, fontWeight: 400, marginTop: 18, color: C.cream }}>
+              Questions, <em style={{ fontStyle: "italic", color: C.accent }}>answered</em>.
+            </h2>
+          </div>
+          <div style={{ maxWidth: 980, margin: "0 auto" }}>
+            <DarkAccordion items={FAQ} />
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── Final CTA ── */}
+      <section style={{ padding: `${sg}px ${p}px`, position: "relative", overflow: "hidden", background: C.cream }}>
+        <DriftingNotes count={12} color={C.brown} opacity={0.16} />
+        <Reveal>
+          <div style={{ position: "relative", zIndex: 2, textAlign: "center", maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ fontFamily: "Imbue, serif", fontSize: 14, letterSpacing: ".22em", textTransform: "uppercase", color: C.brown }}>
+              ★ Limited Seats ★
+            </div>
+            <h2 style={{ fontFamily: "Imbue, serif", fontSize: "clamp(64px, 14vw, 220px)", lineHeight: 0.85, fontWeight: 400, marginTop: 24, color: C.ink }}>
+              Don't miss<br /><em style={{ fontStyle: "italic", color: C.accent }}>the music</em>.
+            </h2>
+            <p className="cta-meta" style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 16 : 26, color: C.ink + "CC", marginTop: 30 }}>
+              {CAMP.dates} · {CAMP.time} · {CAMP.ages}
+            </p>
+            <a
+              href={CAMP.signUpUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="cta-sign-btn"
+              style={{
+                display: "inline-block",
+                marginTop: 44,
+                background: C.ink,
+                color: C.cream,
+                padding: mob ? "18px 28px" : "28px 56px",
+                fontFamily: "Imbue, serif",
+                fontSize: mob ? 18 : 24,
+                letterSpacing: ".14em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                border: `2px solid ${C.ink}`,
+                boxShadow: mob ? `5px 5px 0 ${C.accent}` : `10px 10px 0 ${C.accent}`,
+              }}
+            >
+              Sign up now ★
+            </a>
+            <div className="cta-meta" style={{ marginTop: 36, fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 14 : 17, color: C.ink + "99" }}>
+              or email <a href={`mailto:${CAMP.email}`} style={{ color: C.brown }}>{CAMP.email}</a> · text <span style={{ color: C.brown }}>{CAMP.phone}</span>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer style={{ padding: `${p}px ${p}px ${p * 0.5}px`, background: C.brown, color: C.cream, borderTop: `2px solid ${C.ink}` }}>
+        <div className="resp-grid-2" style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr", gap: mob ? 28 : 40 }}>
+          <div>
+            <div style={{ fontFamily: "Imbue, serif", fontSize: mob ? 26 : 36, lineHeight: 1, color: C.cream }}>
+              Summer Piano<br /><em style={{ fontStyle: "italic", color: C.accent }}>Explorers Camp</em>
+            </div>
+            <div style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: mob ? 15 : 18, color: C.cream + "BB", marginTop: 18, maxWidth: 360, lineHeight: 1.5 }}>
+              {CAMP.tagline}
+            </div>
+          </div>
+          {[
+            { h: "Contact", items: [CAMP.email, CAMP.phone, CAMP.ig] },
+            { h: "Where",   items: [CAMP.location, "Address shared on registration"] },
+            { h: "When",    items: [CAMP.dates, CAMP.time, CAMP.ages] },
+          ].map((col, i) => (
+            <div key={i}>
+              <div style={{ fontFamily: "Imbue, serif", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: C.accent, marginBottom: 12 }}>
+                {col.h}
+              </div>
+              {col.items.map((it, j) => (
+                <div key={j} style={{ fontFamily: "Imbue, serif", fontSize: mob ? 14 : 17, color: C.cream + "DD", marginBottom: 6, lineHeight: 1.4 }}>
+                  {it}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="footer-copy" style={{
+          marginTop: 48,
+          paddingTop: 20,
+          borderTop: `1px solid ${C.cream}33`,
+          fontFamily: '"Cormorant Garamond", serif',
+          fontStyle: "italic",
+          fontSize: 14,
+          color: C.cream + "AA",
+          display: "flex",
+          justifyContent: "space-between",
+        }}>
+          <span>© 2026 Eleni Moon · Pound Ridge, NY</span>
+          <span>Andante, with feeling.</span>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// ─── Mount ────────────────────────────────────────────────────────────────────
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<Page />);
+
+</script>
+</body>
+</html>
